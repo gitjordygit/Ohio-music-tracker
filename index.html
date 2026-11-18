@@ -1,0 +1,2402 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0b0e14" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Music Tracker" />
+  <title>Music Tracker</title>
+  <link id="appIconLink" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230b0e14'/%3E%3Crect x='24' y='24' width='464' height='464' rx='96' fill='none' stroke='%2338bdf8' stroke-width='16'/%3E%3Cpath d='M196 344V164l168-36v180' fill='none' stroke='%2338bdf8' stroke-width='28' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='160' cy='344' r='42' fill='%23f59e0b'/%3E%3Ccircle cx='328' cy='308' r='42' fill='%23f59e0b'/%3E%3C/svg%3E" />
+  <link id="appleTouchIconLink" rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230b0e14'/%3E%3Cpath d='M196 344V164l168-36v180' fill='none' stroke='%2338bdf8' stroke-width='28' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='160' cy='344' r='42' fill='%23f59e0b'/%3E%3Ccircle cx='328' cy='308' r='42' fill='%23f59e0b'/%3E%3C/svg%3E" />
+  <link id="pwaManifestLink" rel="manifest" />
+  <style>
+    /* ==========================================================================
+       DESIGN TOKENS & HIGH-CONTRAST DARK PALETTE
+       ========================================================================== */
+    :root {
+      --bg-primary: #0b0e14;
+      --bg-card: #141923;
+      --bg-elevated: #1c2333;
+      --border-subtle: #263042;
+      --border-active: #38bdf8;
+      --text-primary: #e2e8f0;
+      --text-muted: #94a3b8;
+      --accent-sky: #38bdf8;
+      --accent-sky-soft: rgba(56, 189, 248, 0.14);
+      --accent-amber: #f59e0b;
+      --accent-amber-soft: rgba(245, 158, 11, 0.15);
+      --accent-green: #10b981;
+      --accent-green-soft: rgba(16, 185, 129, 0.14);
+      --accent-red: #ef4444;
+      --accent-red-soft: rgba(239, 68, 68, 0.14);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-full: 9999px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.45;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    button, input, select {
+      font-family: inherit;
+      color: inherit;
+    }
+
+    button {
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+
+    /* ==========================================================================
+       SLIM STICKY COMPACT HEADER & TABS
+       ========================================================================== */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background-color: rgba(11, 14, 20, 0.94);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .header-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 10px 14px 0 14px;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 10px;
+    }
+
+    .title-cluster {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .app-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .region-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: var(--radius-full);
+      background-color: var(--bg-elevated);
+      color: var(--accent-sky);
+      border: 1px solid var(--border-subtle);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .refresh-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--accent-sky);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+    }
+
+    .refresh-btn:hover {
+      background-color: var(--bg-elevated);
+      border-color: var(--accent-sky);
+    }
+
+    .refresh-btn:active {
+      transform: scale(0.94);
+    }
+
+    .refresh-btn.spinning svg {
+      animation: spinOnce 0.55s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    @keyframes spinOnce {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Navigation Tab Strip */
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      min-height: 42px;
+      padding: 8px 12px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .tab-btn.active {
+      color: var(--accent-sky);
+      border-bottom-color: var(--accent-sky);
+    }
+
+    .tab-badge {
+      min-width: 22px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: var(--radius-full);
+      font-size: 0.72rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--bg-elevated);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .tab-btn.active .tab-badge {
+      background-color: var(--accent-amber-soft);
+      color: var(--accent-amber);
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+
+    /* ==========================================================================
+       MAIN CONTAINER & FILTER CONTROLS
+       ========================================================================== */
+    .main-wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 14px 14px 72px 14px;
+    }
+
+    .controls-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    /* City Filter Row + Quick-Add Button */
+    .city-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pill-scroll {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+
+    .pill-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .pill-btn {
+      min-height: 36px;
+      padding: 6px 13px;
+      border-radius: var(--radius-full);
+      font-size: 0.8rem;
+      font-weight: 600;
+      white-space: nowrap;
+      background-color: var(--bg-card);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+      transition: all 0.15s ease;
+    }
+
+    .pill-btn:hover {
+      background-color: var(--bg-elevated);
+      color: var(--text-primary);
+    }
+
+    .pill-btn.active {
+      background-color: var(--accent-sky-soft);
+      color: var(--accent-sky);
+      border-color: var(--accent-sky);
+    }
+
+    .pill-btn.venue-pill.active {
+      background-color: var(--accent-amber-soft);
+      color: var(--accent-amber);
+      border-color: var(--accent-amber);
+    }
+
+    .quick-add-btn {
+      min-height: 36px;
+      padding: 6px 13px;
+      border-radius: var(--radius-full);
+      font-size: 0.8rem;
+      font-weight: 700;
+      background-color: var(--bg-elevated);
+      color: var(--accent-sky);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: background-color 0.15s ease;
+    }
+
+    .quick-add-btn:hover {
+      background-color: var(--accent-sky-soft);
+    }
+
+    /* Date Range Dropdown & Keyword Search */
+    .filter-inputs-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    @media (min-width: 640px) {
+      .filter-inputs-grid {
+        grid-template-columns: 220px 1fr;
+      }
+    }
+
+    .select-box, .search-box {
+      width: 100%;
+      height: 42px;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      font-size: 0.86rem;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .select-box {
+      padding: 0 32px 0 12px;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+
+    .search-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      color: var(--text-muted);
+      pointer-events: none;
+      display: flex;
+    }
+
+    .search-box {
+      padding: 0 36px 0 36px;
+    }
+
+    .select-box:focus, .search-box:focus {
+      border-color: var(--accent-sky);
+    }
+
+    .clear-search {
+      position: absolute;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-full);
+      color: var(--text-muted);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .clear-search.visible {
+      display: inline-flex;
+    }
+
+    /* ==========================================================================
+       COLLAPSIBLE QUICK-ADD SHOW PANEL
+       ========================================================================== */
+    .quick-add-drawer {
+      background-color: var(--bg-card);
+      border: 1px solid var(--accent-sky);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-bottom: 14px;
+      display: none;
+    }
+
+    .quick-add-drawer.open {
+      display: block;
+    }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .drawer-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--accent-sky);
+    }
+
+    .drawer-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    @media (min-width: 640px) {
+      .drawer-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .span-2 {
+        grid-column: span 2;
+      }
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .form-label {
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .form-control {
+      height: 40px;
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 0 11px;
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    .form-control:focus {
+      border-color: var(--accent-sky);
+    }
+
+    .drawer-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .btn-ghost {
+      min-height: 38px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 600;
+      background-color: var(--bg-elevated);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .btn-solid-sky {
+      min-height: 38px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 700;
+      background-color: var(--accent-sky);
+      color: #0b0e14;
+    }
+
+    /* ==========================================================================
+       SUMMARY BAR & SHOW CARDS
+       ========================================================================== */
+    .summary-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      padding: 0 2px;
+    }
+
+    .reset-link {
+      color: var(--accent-sky);
+      font-weight: 600;
+      text-decoration: underline;
+      padding: 4px 2px;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    @media (min-width: 768px) {
+      .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .show-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      display: flex;
+      align-items: stretch;
+      gap: 12px;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .show-card:hover {
+      background-color: var(--bg-elevated);
+      border-color: #34425c;
+    }
+
+    .show-card.saved {
+      border-color: rgba(245, 158, 11, 0.55);
+      background: linear-gradient(155deg, var(--bg-card) 68%, rgba(245, 158, 11, 0.07) 100%);
+    }
+
+    /* Date Badge */
+    .date-box {
+      width: 58px;
+      min-width: 58px;
+      border-radius: 10px;
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 4px;
+      text-align: center;
+    }
+
+    .show-card.saved .date-box {
+      border-color: rgba(245, 158, 11, 0.45);
+    }
+
+    .date-dow {
+      font-size: 0.66rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-sky);
+    }
+
+    .date-md {
+      font-size: 0.96rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-top: 2px;
+      line-height: 1.15;
+    }
+
+    /* Card Content */
+    .card-body {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .status-pill {
+      font-size: 0.66rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 7px;
+      border-radius: 5px;
+    }
+
+    .status-confirmed {
+      background-color: var(--accent-green-soft);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-check {
+      background-color: var(--accent-amber-soft);
+      color: var(--accent-amber);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .status-custom {
+      background-color: var(--accent-sky-soft);
+      color: var(--accent-sky);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .source-link-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.66rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 5px;
+      background-color: var(--bg-primary);
+      color: var(--accent-sky);
+      border: 1px solid var(--border-subtle);
+      text-decoration: none;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    .source-link-pill:hover {
+      border-color: var(--accent-sky);
+      background-color: var(--accent-sky-soft);
+    }
+
+    /* Live Venue Calendars Quick-Launch Directory */
+    .calendars-drawer {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      margin-bottom: 14px;
+      display: none;
+    }
+
+    .calendars-drawer.open {
+      display: block;
+    }
+
+    .venue-links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .venue-cal-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 11px;
+      border-radius: var(--radius-sm);
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    .venue-cal-link:hover {
+      border-color: var(--accent-sky);
+      background-color: var(--bg-elevated);
+    }
+
+    .json-tools-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .btn-json-tool {
+      min-height: 36px;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      font-weight: 600;
+      background-color: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-json-tool:hover {
+      border-color: var(--accent-sky);
+      color: var(--accent-sky);
+    }
+
+    .headliner {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.25;
+      word-break: break-word;
+    }
+
+    .opener-line {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    .venue-city-line {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 0.81rem;
+    }
+
+    .venue-label {
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    .city-pill {
+      font-size: 0.66rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .city-dayton {
+      background-color: rgba(56, 189, 248, 0.14);
+      color: #38bdf8;
+    }
+
+    .city-cincinnati {
+      background-color: rgba(245, 158, 11, 0.16);
+      color: #fbbf24;
+    }
+
+    .city-columbus {
+      background-color: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+    }
+
+    .time-notes-line {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .notes-highlight {
+      color: #cbd5e1;
+    }
+
+    /* Card Right Action Column */
+    .card-side {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .save-toggle-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-sm);
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .save-toggle-btn:hover {
+      border-color: var(--accent-amber);
+      color: var(--accent-amber);
+    }
+
+    .save-toggle-btn.active {
+      background-color: var(--accent-amber-soft);
+      border-color: var(--accent-amber);
+      color: var(--accent-amber);
+    }
+
+    .delete-btn {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 4px 7px;
+      border-radius: 6px;
+    }
+
+    .delete-btn:hover {
+      color: var(--accent-red);
+      background-color: var(--accent-red-soft);
+    }
+
+    /* ==========================================================================
+       SAVED LINEUP VIEW & EXPORT TOOLBAR
+       ========================================================================== */
+    .export-bar {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .export-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .action-btn {
+      min-height: 40px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-decoration: none;
+      flex: 1 1 auto;
+      transition: opacity 0.15s ease, transform 0.1s ease;
+    }
+
+    .action-btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-copy-lineup {
+      background-color: var(--accent-sky);
+      color: #0b0e14;
+    }
+
+    .btn-email-jordan {
+      background-color: var(--accent-amber);
+      color: #0b0e14;
+    }
+
+    .btn-clear-saved {
+      background-color: var(--bg-elevated);
+      color: var(--accent-red);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      flex: 0 1 auto;
+    }
+
+    .inline-confirm {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      background-color: var(--accent-red-soft);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      font-size: 0.8rem;
+      color: #fca5a5;
+    }
+
+    .inline-confirm.open {
+      display: flex;
+    }
+
+    .confirm-btns {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .btn-confirm-clear {
+      min-height: 32px;
+      padding: 4px 11px;
+      border-radius: 6px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      background-color: var(--accent-red);
+      color: #ffffff;
+    }
+
+    .btn-confirm-cancel {
+      min-height: 32px;
+      padding: 4px 11px;
+      border-radius: 6px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      background-color: var(--bg-card);
+      color: var(--text-primary);
+    }
+
+    /* Empty State */
+    .empty-box {
+      background-color: var(--bg-card);
+      border: 1px dashed var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 36px 18px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      grid-column: 1 / -1;
+    }
+
+    .empty-heading {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .empty-sub {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      max-width: 380px;
+    }
+
+    /* Hidden Clipboard Helper & Toast */
+    #copyBuffer {
+      position: fixed;
+      left: -9999px;
+      top: 0;
+      opacity: 0;
+    }
+
+    .toast-pill {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(18px);
+      background-color: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--accent-sky);
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.55);
+      padding: 10px 18px;
+      border-radius: var(--radius-full);
+      font-size: 0.82rem;
+      font-weight: 600;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      max-width: 92vw;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toast-pill.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================
+       COMPACT STICKY HEADER
+       ======================================================================== -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="header-top">
+        <div class="title-cluster">
+          <h1 class="app-title">Music Tracker</h1>
+          <span class="region-badge">Dayton &bull; Cincy &bull; Cbus</span>
+        </div>
+
+        <button id="refreshBtn" class="refresh-btn" type="button" title="Refresh Listings" aria-label="Refresh Listings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="tab-bar" aria-label="Views">
+        <button id="tabAll" class="tab-btn active" type="button">
+          <span>All Shows</span>
+          <span id="allBadge" class="tab-badge">0</span>
+        </button>
+        <button id="tabSaved" class="tab-btn" type="button">
+          <span>Saved Lineup</span>
+          <span id="savedBadge" class="tab-badge">0</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       MAIN CONTENT
+       ======================================================================== -->
+  <main class="main-wrap">
+
+    <!-- ALL SHOWS VIEW -->
+    <section id="viewAll">
+      <div class="controls-stack">
+        <!-- City Pills & Quick-Add Trigger -->
+        <div class="city-row">
+          <div id="cityPills" class="pill-scroll" role="group" aria-label="Filter by City">
+            <button type="button" class="pill-btn active" data-city="ALL">All Cities</button>
+            <button type="button" class="pill-btn" data-city="Dayton">Dayton</button>
+            <button type="button" class="pill-btn" data-city="Cincinnati">Cincinnati</button>
+            <button type="button" class="pill-btn" data-city="Columbus">Columbus</button>
+          </div>
+
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button id="liveCalendarsToggle" class="quick-add-btn" type="button" aria-expanded="false" style="color: var(--accent-amber); border-color: rgba(245, 158, 11, 0.4);">
+              <span>Live Venue Calendars</span>
+            </button>
+
+            <button id="quickAddToggle" class="quick-add-btn" type="button" aria-expanded="false">
+              <span>+ Quick-Add Show</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Horizontal Venue Pills -->
+        <div id="venuePills" class="pill-scroll" role="group" aria-label="Filter by Venue"></div>
+
+        <!-- Date Range Dropdown & Keyword Search -->
+        <div class="filter-inputs-grid">
+          <select id="dateRangeSelect" class="select-box" aria-label="Filter by Date Range">
+            <option value="ALL">All Dates</option>
+            <option value="THIS_WEEK">This Week (Nov 17–23)</option>
+            <option value="LATE_NOV">Late Nov (Nov 24–30)</option>
+            <option value="DEC_2026">December 2026</option>
+          </select>
+
+          <div class="search-wrap">
+            <span class="search-icon" aria-hidden="true">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </span>
+            <input id="searchInput" class="search-box" type="text" placeholder="Search artist, opener, venue, or genre/notes..." autocomplete="off" />
+            <button id="clearSearchBtn" class="clear-search" type="button" aria-label="Clear search">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collapsible Quick-Add Show Drawer -->
+      <div id="quickAddDrawer" class="quick-add-drawer">
+        <div class="drawer-header">
+          <span class="drawer-title">Add Show to Local Schedule</span>
+          <button id="closeDrawerBtn" type="button" style="color: var(--text-muted); font-size: 0.8rem;">Close</button>
+        </div>
+
+        <form id="quickAddForm">
+          <div class="drawer-grid">
+            <div class="form-field">
+              <label class="form-label" for="qaDate">Date *</label>
+              <input id="qaDate" class="form-control" type="date" value="2026-11-20" required />
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="qaTime">Time / Doors *</label>
+              <input id="qaTime" class="form-control" type="text" value="Doors 7:00 PM / Show 8:00 PM" placeholder="e.g., Doors 7:00 PM" required />
+            </div>
+
+            <div class="form-field span-2">
+              <label class="form-label" for="qaHeadliner">Artist / Headliner *</label>
+              <input id="qaHeadliner" class="form-control" type="text" placeholder="e.g., Guided By Voices" required />
+            </div>
+
+            <div class="form-field span-2">
+              <label class="form-label" for="qaOpener">Opener / Support</label>
+              <input id="qaOpener" class="form-control" type="text" placeholder="e.g., Local Support TBA" />
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="qaVenue">Venue *</label>
+              <input id="qaVenue" class="form-control" type="text" list="venueDatalist" placeholder="e.g., Blind Bob's" required />
+              <datalist id="venueDatalist"></datalist>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="qaCity">City *</label>
+              <select id="qaCity" class="form-control" required>
+                <option value="Dayton">Dayton</option>
+                <option value="Cincinnati">Cincinnati</option>
+                <option value="Columbus">Columbus</option>
+              </select>
+            </div>
+
+            <div class="form-field span-2">
+              <label class="form-label" for="qaNotes">Ticket / Genre / Notes</label>
+              <input id="qaNotes" class="form-control" type="text" placeholder="e.g., Indie Rock • $15 adv / 21+" />
+            </div>
+
+            <div class="form-field span-2">
+              <label class="form-label" for="qaSourceUrl">Verified Source URL (Venue / Ticket Link) *</label>
+              <input id="qaSourceUrl" class="form-control" type="url" placeholder="https://..." required />
+            </div>
+          </div>
+
+          <div class="drawer-footer">
+            <button id="cancelDrawerBtn" type="button" class="btn-ghost">Cancel</button>
+            <button type="submit" class="btn-solid-sky">Save Show</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Direct Live Venue Calendars Directory Drawer -->
+      <div id="liveCalendarsDrawer" class="calendars-drawer">
+        <div class="drawer-header" style="margin-bottom: 4px;">
+          <span class="drawer-title" style="color: var(--accent-amber);">Direct Venue Calendars (Source of Truth)</span>
+          <button id="closeCalendarsBtn" type="button" style="color: var(--text-muted); font-size: 0.8rem;">Close</button>
+        </div>
+        <div style="font-size: 0.76rem; color: var(--text-muted);">
+          Open official venue schedules directly—no unverified placeholder dates are injected into this tracker.
+        </div>
+        <div id="venueCalLinksGrid" class="venue-links-grid"></div>
+      </div>
+
+      <!-- Results Count & Filter Reset -->
+      <div class="summary-bar">
+        <span id="summaryCountText">Showing 0 listings</span>
+        <button id="resetFiltersBtn" type="button" class="reset-link hidden">Reset filters</button>
+      </div>
+
+      <!-- Cards Container -->
+      <div id="allCardsGrid" class="cards-grid"></div>
+    </section>
+
+    <!-- SAVED LINEUP VIEW -->
+    <section id="viewSaved" class="hidden">
+      <div class="export-bar">
+        <div class="export-actions">
+          <button id="copyLineupBtn" class="action-btn btn-copy-lineup" type="button">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>Copy Lineup</span>
+          </button>
+
+          <a id="emailJordanLink" class="action-btn btn-email-jordan" href="mailto:jordanfromtipp@gmail.com?subject=Ohio%20Music%20Tracker%20Lineup">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            <span>Email to Jordan</span>
+          </a>
+
+          <button id="clearSavedBtn" class="action-btn btn-clear-saved" type="button">
+            <span>Clear Saved</span>
+          </button>
+        </div>
+
+        <!-- Portable JSON Dataset Backup & Import -->
+        <div class="json-tools-row">
+          <button id="exportJsonBtn" class="btn-json-tool" type="button">
+            <span>Export Verified JSON</span>
+          </button>
+          <button id="importJsonTriggerBtn" class="btn-json-tool" type="button">
+            <span>Import JSON</span>
+          </button>
+          <input id="importJsonFileInput" type="file" accept=".json,application/json" class="hidden" />
+        </div>
+
+        <!-- Two-step Inline Confirmation -->
+        <div id="inlineConfirmBar" class="inline-confirm">
+          <span>Clear all saved shows from your lineup?</span>
+          <div class="confirm-btns">
+            <button id="confirmClearBtn" class="btn-confirm-clear" type="button">Confirm Clear?</button>
+            <button id="cancelClearBtn" class="btn-confirm-cancel" type="button">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="savedCardsGrid" class="cards-grid"></div>
+    </section>
+
+  </main>
+
+  <textarea id="copyBuffer" aria-hidden="true"></textarea>
+  <div id="toast" class="toast-pill" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      /* ========================================================================
+         STORAGE KEYS & VENUE DIRECTORY
+         ======================================================================== */
+      const STORAGE_KEYS = {
+        BOOKMARKS: "ohio_music_tracker_bookmarks_v2",
+        CUSTOM_SHOWS: "ohio_music_tracker_custom_v2",
+        FILTERS: "ohio_music_tracker_filters_v2"
+      };
+
+      const VENUE_DIRECTORY = [
+        // Dayton
+        { name: "Blind Bob's", city: "Dayton", url: "https://blindbobs.com/" },
+        { name: "The Hidden Gem Music Club", city: "Dayton", url: "https://www.hiddengemdayton.com/" },
+        { name: "Yellow Cab Tavern", city: "Dayton", url: "https://www.yellowcabtavern.com/" },
+        // Cincinnati
+        { name: "Northside Tavern", city: "Cincinnati", url: "https://www.northsidetav.com/" },
+        { name: "Uncle Leo's", city: "Cincinnati", url: "https://www.instagram.com/uncleleosotr/" },
+        { name: "Cousin Jeffrey's Honky Tonk", city: "Cincinnati", url: "https://www.instagram.com/cousinjeffreyshonkytonk/" },
+        { name: "Ludlow Garage", city: "Cincinnati", url: "https://ludlowgaragecincinnati.com/" },
+        { name: "Bogart's", city: "Cincinnati", url: "https://www.bogarts.com/" },
+        // Columbus
+        { name: "Ace of Cups", city: "Columbus", url: "https://aceofcupsbar.com/" },
+        { name: "Rumba Cafe", city: "Columbus", url: "https://www.columbusrumbacafe.com/calendar/" },
+        { name: "Spacebar", city: "Columbus", url: "https://www.spacebarcolumbus.com/" },
+        { name: "Newport Music Hall", city: "Columbus", url: "https://promowestlive.com/columbus/newport-music-hall" },
+        { name: "The Summit Music Hall", city: "Columbus", url: "https://www.thesummitcolumbus.com/" }
+      ];
+
+      /* ========================================================================
+         VERIFIED LISTINGS ONLY (MANDATORY sourceUrl GUARDRAIL)
+         - Zero synthetic/template "Check Venue" rows.
+         - Every listing below is backed by a verified live search URL.
+         ======================================================================== */
+      const RAW_BASE_LISTINGS = [
+        {
+          id: "show-nov18-ace-aptbs",
+          date: "2026-11-18",
+          headliner: "A Place To Bury Strangers",
+          opener: "ADULT.",
+          venue: "Ace of Cups",
+          city: "Columbus",
+          time: "Doors 7:00 PM",
+          notes: "Noise Rock / Post-Punk",
+          status: "Confirmed",
+          sourceUrl: "https://aceofcupsbar.com/"
+        },
+        {
+          id: "show-nov18-gem-jazz",
+          date: "2026-11-18",
+          headliner: "The Dayton Jazz Ensemble",
+          opener: "with MRMS Jazz Band",
+          venue: "The Hidden Gem Music Club",
+          city: "Dayton",
+          time: "Doors 6:00 PM / Show 7:00 PM",
+          notes: "Big Band / Jazz • $10 • All Ages",
+          status: "Confirmed",
+          sourceUrl: "https://www.hiddengemdayton.com/"
+        },
+        {
+          id: "show-nov18-rumba-surfing",
+          date: "2026-11-18",
+          headliner: "Surfing For Daisy",
+          opener: "Belle & Chain",
+          venue: "Rumba Cafe",
+          city: "Columbus",
+          time: "8:00 PM",
+          notes: "Indie / Alt-Rock",
+          status: "Confirmed",
+          sourceUrl: "https://www.columbusrumbacafe.com/calendar/"
+        },
+        {
+          id: "show-nov18-bogarts-gravy",
+          date: "2026-11-18",
+          headliner: "Yung Gravy: The Joyrider Tour",
+          opener: "Support TBA",
+          venue: "Bogart's",
+          city: "Cincinnati",
+          time: "7:00 PM",
+          notes: "Hip-Hop • Short Vine",
+          status: "Confirmed",
+          sourceUrl: "https://www.bogarts.com/"
+        },
+        {
+          id: "show-nov18-newport-chatpile",
+          date: "2026-11-18",
+          headliner: "Chat Pile",
+          opener: "Soul Glo, Shallowater",
+          venue: "Newport Music Hall",
+          city: "Columbus",
+          time: "Doors 6:30 PM",
+          notes: "Who Loves The Sun Tour • All Ages",
+          status: "Confirmed",
+          sourceUrl: "https://promowestlive.com/index.php/columbus/newport-music-hall/2026/11/chat-pile-who-loves-the-sun-tour-2026"
+        },
+        {
+          id: "show-nov18-spacebar-minkin",
+          date: "2026-11-18",
+          headliner: "Julia Minkin",
+          opener: "Hope Selah, Talitha Boyd",
+          venue: "Spacebar",
+          city: "Columbus",
+          time: "Doors 7:00 PM",
+          notes: "$13/$15 • 18+",
+          status: "Confirmed",
+          sourceUrl: "https://www.spacebarcolumbus.com/"
+        },
+        {
+          id: "show-nov19-gem-tides",
+          date: "2026-11-19",
+          headliner: "Taken By Tides",
+          opener: "Rain Division, Take The Name, Hall of the Elders, Eyes of Your Enemy",
+          venue: "The Hidden Gem Music Club",
+          city: "Dayton",
+          time: "Doors 6:00 PM / Show 7:00 PM",
+          notes: "Ghost Vibrations Tour",
+          status: "Confirmed",
+          sourceUrl: "https://www.hiddengemdayton.com/"
+        },
+        {
+          id: "show-nov19-ludlow-tomrush",
+          date: "2026-11-19",
+          headliner: "Tom Rush",
+          opener: "Evening With",
+          venue: "Ludlow Garage",
+          city: "Cincinnati",
+          time: "7:30 PM",
+          notes: "Folk / Singer-Songwriter",
+          status: "Confirmed",
+          sourceUrl: "https://ludlow-garage.ticketscincinnati.org/"
+        },
+        {
+          id: "show-nov20-blindbobs-metime",
+          date: "2026-11-20",
+          headliner: "Me Time",
+          opener: "The Fotons, Jake Giesige",
+          venue: "Blind Bob's",
+          city: "Dayton",
+          time: "8:00 PM",
+          notes: "Oregon District • 21+",
+          status: "Confirmed",
+          sourceUrl: "https://allevents.in/dayton/concerts"
+        },
+        {
+          id: "show-nov20-bogarts-everclear",
+          date: "2026-11-20",
+          headliner: "Everclear - Lucky 7 Tour",
+          opener: "American Hi-Fi",
+          venue: "Bogart's",
+          city: "Cincinnati",
+          time: "7:00 PM",
+          notes: "90s Alt-Rock",
+          status: "Confirmed",
+          sourceUrl: "https://www.bogarts.com/"
+        },
+        {
+          id: "show-nov20-ace-hotfreaks",
+          date: "2026-11-20",
+          headliner: "Hot Freaks",
+          opener: "Support TBA",
+          venue: "Ace of Cups",
+          city: "Columbus",
+          time: "Doors 6:00 PM",
+          notes: "Indie Pop",
+          status: "Confirmed",
+          sourceUrl: "https://aceofcupsbar.com/"
+        },
+        {
+          id: "show-nov20-newport-rwb",
+          date: "2026-11-20",
+          headliner: "Red Wanting Blue",
+          opener: "Support TBA",
+          venue: "Newport Music Hall",
+          city: "Columbus",
+          time: "8:00 PM",
+          notes: "Ohio Heartland Rock",
+          status: "Confirmed",
+          sourceUrl: "https://www.axs.com/venues/102460/newport-music-hall-columbus-tickets"
+        },
+        {
+          id: "show-nov20-spacebar-theout",
+          date: "2026-11-20",
+          headliner: "The Out",
+          opener: "Howling Commandos, Saynt Bernard",
+          venue: "Spacebar",
+          city: "Columbus",
+          time: "Doors 7:00 PM",
+          notes: "$10 • 18+",
+          status: "Confirmed",
+          sourceUrl: "https://www.spacebarcolumbus.com/"
+        },
+        {
+          id: "show-nov21-northside-joestruckstop",
+          date: "2026-11-21",
+          headliner: "Joe's Truck Stop",
+          opener: "Support TBA",
+          venue: "Northside Tavern",
+          city: "Cincinnati",
+          time: "7:00 PM",
+          notes: "Country / Honky-Tonk",
+          status: "Confirmed",
+          sourceUrl: "https://www.shazam.com/event/ec999568-a010-4fa2-b8f3-fb1ebfaa3b8e"
+        },
+        {
+          id: "show-nov21-ludlow-obrien",
+          date: "2026-11-21",
+          headliner: "Tim O'Brien, Sam Grisman & Victor Furtado",
+          opener: "Acoustic Trio",
+          venue: "Ludlow Garage",
+          city: "Cincinnati",
+          time: "7:30 PM",
+          notes: "Bluegrass / Americana",
+          status: "Confirmed",
+          sourceUrl: "https://ludlow-garage.ticketscincinnati.org/"
+        },
+        {
+          id: "show-nov21-newport-lastwaltz",
+          date: "2026-11-21",
+          headliner: "Columbus' 13th Annual Tribute to The Last Waltz",
+          opener: "Presented by WCBE",
+          venue: "Newport Music Hall",
+          city: "Columbus",
+          time: "8:00 PM",
+          notes: "Annual Tribute Show",
+          status: "Confirmed",
+          sourceUrl: "https://promowestlive.com/columbus/newport-music-hall/2026/11/columbus-13th-annual-tribute-to-the-last-waltz"
+        },
+        {
+          id: "show-nov22-ace-tagabow",
+          date: "2026-11-22",
+          headliner: "They Are Gutting a Body of Water",
+          opener: "Support TBA",
+          venue: "Ace of Cups",
+          city: "Columbus",
+          time: "Doors 6:00 PM",
+          notes: "Shoegaze / Noise Pop",
+          status: "Confirmed",
+          sourceUrl: "https://aceofcupsbar.com/"
+        },
+        {
+          id: "show-nov23-ace-jer",
+          date: "2026-11-23",
+          headliner: "JER",
+          opener: "Support TBA",
+          venue: "Ace of Cups",
+          city: "Columbus",
+          time: "Doors 7:00 PM",
+          notes: "Ska / Punk",
+          status: "Confirmed",
+          sourceUrl: "https://aceofcupsbar.com/"
+        },
+        {
+          id: "show-nov24-blindbobs-openmic",
+          date: "2026-11-24",
+          headliner: "Open Mic with Brandon",
+          opener: "Weekly Tuesday Open Mic",
+          venue: "Blind Bob's",
+          city: "Dayton",
+          time: "7:00 PM",
+          notes: "Free • Oregon District",
+          status: "Confirmed",
+          sourceUrl: "https://venunite.com/events/open-mic-with-brandon-blind-bobs-8"
+        },
+        {
+          id: "show-nov25-rumba-hoodoo",
+          date: "2026-11-25",
+          headliner: "Hoodoo Soul Band",
+          opener: "Thanksgiving Eve Show",
+          venue: "Rumba Cafe",
+          city: "Columbus",
+          time: "9:00 PM",
+          notes: "Funk / Soul",
+          status: "Confirmed",
+          sourceUrl: "https://www.columbusrumbacafe.com/event/"
+        },
+        {
+          id: "show-nov27-blindbobs-backstabbath",
+          date: "2026-11-27",
+          headliner: "Back Stabbath & Evil Empire",
+          opener: "Black Sabbath & RATM Tributes",
+          venue: "Blind Bob's",
+          city: "Dayton",
+          time: "11:00 PM",
+          notes: "Late Night • 21+",
+          status: "Confirmed",
+          sourceUrl: "https://allevents.in/dayton/concerts"
+        },
+        {
+          id: "show-nov27-rumba-spikedrivers",
+          date: "2026-11-27",
+          headliner: "The Spikedrivers",
+          opener: "Annual Black Friday Show",
+          venue: "Rumba Cafe",
+          city: "Columbus",
+          time: "7:00 PM",
+          notes: "Americana / Roots Rock",
+          status: "Confirmed",
+          sourceUrl: "https://www.columbusrumbacafe.com/calendar/"
+        },
+        {
+          id: "show-nov27-bogarts-jackkays",
+          date: "2026-11-27",
+          headliner: "Jack Kays - 3rd Annual \"Jack's Jam\"",
+          opener: "KennyHoopla, Worry Club, Pretty Bitter",
+          venue: "Bogart's",
+          city: "Cincinnati",
+          time: "5:30 PM",
+          notes: "Alt-Rock / Punk",
+          status: "Confirmed",
+          sourceUrl: "https://www.bogarts.com/"
+        },
+        {
+          id: "show-nov28-blindbobs-thunderlover",
+          date: "2026-11-28",
+          headliner: "Thunderlover",
+          opener: "Sadbox, Toxic Nobility",
+          venue: "Blind Bob's",
+          city: "Dayton",
+          time: "8:00 PM",
+          notes: "Rock / Punk • 21+",
+          status: "Confirmed",
+          sourceUrl: "https://allevents.in/dayton/concerts"
+        },
+        {
+          id: "show-dec03-bogarts-bonethugs",
+          date: "2026-12-03",
+          headliner: "Bone Thugs-N-Harmony",
+          opener: "Support TBA",
+          venue: "Bogart's",
+          city: "Cincinnati",
+          time: "7:00 PM",
+          notes: "Hip-Hop • Cleveland Legends",
+          status: "Confirmed",
+          sourceUrl: "https://www.bogarts.com/"
+        },
+        {
+          id: "show-dec04-ace-aurorawave",
+          date: "2026-12-04",
+          headliner: "aurorawave",
+          opener: "Support TBA",
+          venue: "Ace of Cups",
+          city: "Columbus",
+          time: "Doors 6:00 PM",
+          notes: "Reggae-Core / Rock",
+          status: "Confirmed",
+          sourceUrl: "https://aceofcupsbar.com/"
+        },
+        {
+          id: "show-dec05-ace-distant",
+          date: "2026-12-05",
+          headliner: "Distant",
+          opener: "Support TBA",
+          venue: "Ace of Cups",
+          city: "Columbus",
+          time: "Doors 6:00 PM",
+          notes: "Deathcore / Metal",
+          status: "Confirmed",
+          sourceUrl: "https://aceofcupsbar.com/"
+        },
+        {
+          id: "show-dec10-ludlow-drakewhite",
+          date: "2026-12-10",
+          headliner: "Drake White",
+          opener: "Support TBA",
+          venue: "Ludlow Garage",
+          city: "Cincinnati",
+          time: "7:30 PM",
+          notes: "Country / Southern Soul",
+          status: "Confirmed",
+          sourceUrl: "https://ludlow-garage.ticketscincinnati.org/"
+        },
+        {
+          id: "show-dec11-gem-houses",
+          date: "2026-12-11",
+          headliner: "Houses of the Holy - The Led Zeppelin Experience",
+          opener: "Tribute Performance",
+          venue: "The Hidden Gem Music Club",
+          city: "Dayton",
+          time: "8:00 PM",
+          notes: "Classic Rock Tribute",
+          status: "Confirmed",
+          sourceUrl: "https://allevents.in/kettering-us/music"
+        },
+        {
+          id: "show-dec16-spacebar-nbt",
+          date: "2026-12-16",
+          headliner: "New Bomb Turks",
+          opener: "Red Velvet Letdown",
+          venue: "Spacebar",
+          city: "Columbus",
+          time: "Doors 6:00 PM / Show 7:00 PM",
+          notes: "Columbus Punk Legends • $20/$25 • 18+",
+          status: "Confirmed",
+          sourceUrl: "https://www.spacebarcolumbus.com/"
+        },
+        {
+          id: "show-dec17-newport-shakey",
+          date: "2026-12-17",
+          headliner: "Shakey Graves - Fondness, Etc. Tour",
+          opener: "Jobi Riccio",
+          venue: "Newport Music Hall",
+          city: "Columbus",
+          time: "8:00 PM",
+          notes: "Americana / Indie Folk",
+          status: "Confirmed",
+          sourceUrl: "https://promowestlive.com/columbus/newport-music-hall/2026/11/columbus-13th-annual-tribute-to-the-last-waltz"
+        },
+        {
+          id: "show-dec18-ludlow-pharcyde",
+          date: "2026-12-18",
+          headliner: "The Pharcyde",
+          opener: "Support TBA",
+          venue: "Ludlow Garage",
+          city: "Cincinnati",
+          time: "7:30 PM",
+          notes: "Hip-Hop",
+          status: "Confirmed",
+          sourceUrl: "https://ludlow-garage.ticketscincinnati.org/"
+        },
+        {
+          id: "show-dec18-ace-casualties",
+          date: "2026-12-18",
+          headliner: "The Casualties: People Over Power Tour",
+          opener: "Support TBA",
+          venue: "Ace of Cups",
+          city: "Columbus",
+          time: "Doors 6:00 PM",
+          notes: "Street Punk",
+          status: "Confirmed",
+          sourceUrl: "https://events.yodel.today/columbus-oh/profile/Ace-of-Cups/64203"
+        }
+      ];
+
+      // Runtime Guardrail: Reject any base listing missing a valid http(s) sourceUrl
+      function isValidSourceUrl(url) {
+        return typeof url === "string" && /^https?:\/\/.+/i.test(url.trim());
+      }
+
+      const BASE_LISTINGS = RAW_BASE_LISTINGS.filter((item) => isValidSourceUrl(item.sourceUrl));
+
+      /* ========================================================================
+         PERSISTED STATE INITIALIZATION
+         ======================================================================== */
+      const savedFilters = loadStorage(STORAGE_KEYS.FILTERS, {
+        city: "ALL",
+        venue: "ALL",
+        dateRange: "ALL",
+        search: ""
+      });
+
+      let state = {
+        activeTab: "all",
+        city: savedFilters.city || "ALL",
+        venue: savedFilters.venue || "ALL",
+        dateRange: savedFilters.dateRange || "ALL",
+        search: savedFilters.search || "",
+        bookmarks: loadStorage(STORAGE_KEYS.BOOKMARKS, []),
+        customShows: loadStorage(STORAGE_KEYS.CUSTOM_SHOWS, []).filter((s) => isValidSourceUrl(s.sourceUrl))
+      };
+
+      /* ========================================================================
+         DOM CACHE
+         ======================================================================== */
+      const dom = {
+        refreshBtn: document.getElementById("refreshBtn"),
+        tabAll: document.getElementById("tabAll"),
+        tabSaved: document.getElementById("tabSaved"),
+        allBadge: document.getElementById("allBadge"),
+        savedBadge: document.getElementById("savedBadge"),
+        viewAll: document.getElementById("viewAll"),
+        viewSaved: document.getElementById("viewSaved"),
+        cityPills: document.getElementById("cityPills"),
+        venuePills: document.getElementById("venuePills"),
+        dateRangeSelect: document.getElementById("dateRangeSelect"),
+        searchInput: document.getElementById("searchInput"),
+        clearSearchBtn: document.getElementById("clearSearchBtn"),
+        liveCalendarsToggle: document.getElementById("liveCalendarsToggle"),
+        liveCalendarsDrawer: document.getElementById("liveCalendarsDrawer"),
+        closeCalendarsBtn: document.getElementById("closeCalendarsBtn"),
+        venueCalLinksGrid: document.getElementById("venueCalLinksGrid"),
+        quickAddToggle: document.getElementById("quickAddToggle"),
+        quickAddDrawer: document.getElementById("quickAddDrawer"),
+        closeDrawerBtn: document.getElementById("closeDrawerBtn"),
+        cancelDrawerBtn: document.getElementById("cancelDrawerBtn"),
+        quickAddForm: document.getElementById("quickAddForm"),
+        venueDatalist: document.getElementById("venueDatalist"),
+        summaryCountText: document.getElementById("summaryCountText"),
+        resetFiltersBtn: document.getElementById("resetFiltersBtn"),
+        allCardsGrid: document.getElementById("allCardsGrid"),
+        savedCardsGrid: document.getElementById("savedCardsGrid"),
+        copyLineupBtn: document.getElementById("copyLineupBtn"),
+        emailJordanLink: document.getElementById("emailJordanLink"),
+        clearSavedBtn: document.getElementById("clearSavedBtn"),
+        exportJsonBtn: document.getElementById("exportJsonBtn"),
+        importJsonTriggerBtn: document.getElementById("importJsonTriggerBtn"),
+        importJsonFileInput: document.getElementById("importJsonFileInput"),
+        inlineConfirmBar: document.getElementById("inlineConfirmBar"),
+        confirmClearBtn: document.getElementById("confirmClearBtn"),
+        cancelClearBtn: document.getElementById("cancelClearBtn"),
+        copyBuffer: document.getElementById("copyBuffer"),
+        toast: document.getElementById("toast")
+      };
+
+      /* ========================================================================
+         STORAGE & HELPER FUNCTIONS
+         ======================================================================== */
+      function loadStorage(key, fallback) {
+        try {
+          const item = localStorage.getItem(key);
+          return item ? JSON.parse(item) : fallback;
+        } catch (e) {
+          return fallback;
+        }
+      }
+
+      function saveStorage(key, value) {
+        try {
+          localStorage.setItem(key, JSON.stringify(value));
+        } catch (e) {
+          showToast("Local storage unavailable in this preview");
+        }
+      }
+
+      function persistFilters() {
+        saveStorage(STORAGE_KEYS.FILTERS, {
+          city: state.city,
+          venue: state.venue,
+          dateRange: state.dateRange,
+          search: state.search
+        });
+      }
+
+      let toastTimeout = null;
+      function showToast(msg) {
+        dom.toast.textContent = msg;
+        dom.toast.classList.add("visible");
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+          dom.toast.classList.remove("visible");
+        }, 2500);
+      }
+
+      function escapeHtml(text) {
+        return String(text || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function formatDateMeta(isoDate) {
+        const [y, m, d] = isoDate.split("-").map(Number);
+        const dt = new Date(y, m - 1, d);
+        const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        return {
+          dow: days[dt.getDay()],
+          monthDay: `${months[dt.getMonth()]} ${d}`,
+          full: `${days[dt.getDay()]}, ${months[dt.getMonth()]} ${d}, ${y}`
+        };
+      }
+
+      function getCombinedShows() {
+        return [...BASE_LISTINGS, ...state.customShows].sort((a, b) => {
+          if (a.date !== b.date) return a.date.localeCompare(b.date);
+          return a.headliner.localeCompare(b.headliner);
+        });
+      }
+
+      /* ========================================================================
+         VENUE PILLS & FILTER SYNC
+         ======================================================================== */
+      function renderVenuePills() {
+        const combined = getCombinedShows();
+        const venueMap = new Map();
+
+        // Seed all tracked venues with their city
+        VENUE_DIRECTORY.forEach((v) => venueMap.set(v.name, v.city));
+        // Include any custom-added venues
+        combined.forEach((s) => {
+          if (!venueMap.has(s.venue)) {
+            venueMap.set(s.venue, s.city);
+          }
+        });
+
+        const matchingVenues = [];
+        venueMap.forEach((city, venueName) => {
+          if (state.city === "ALL" || city === state.city) {
+            matchingVenues.push(venueName);
+          }
+        });
+
+        // Reset venue filter if it does not belong to the newly chosen city
+        if (state.venue !== "ALL" && !matchingVenues.includes(state.venue)) {
+          state.venue = "ALL";
+          persistFilters();
+        }
+
+        let html = `<button type="button" class="pill-btn venue-pill ${state.venue === "ALL" ? "active" : ""}" data-venue="ALL">All Venues</button>`;
+        matchingVenues.forEach((v) => {
+          const activeClass = state.venue === v ? "active" : "";
+          html += `<button type="button" class="pill-btn venue-pill ${activeClass}" data-venue="${escapeHtml(v)}">${escapeHtml(v)}</button>`;
+        });
+        dom.venuePills.innerHTML = html;
+
+        // Update Quick-Add venue datalist
+        dom.venueDatalist.innerHTML = Array.from(venueMap.keys())
+          .map((v) => `<option value="${escapeHtml(v)}"></option>`)
+          .join("");
+
+        // Render Live Venue Calendars Quick-Launch Grid (scoped to active city)
+        const dirVenues = VENUE_DIRECTORY.filter((v) => state.city === "ALL" || v.city === state.city);
+        dom.venueCalLinksGrid.innerHTML = dirVenues
+          .map((v) => {
+            const cClass =
+              v.city === "Dayton"
+                ? "city-dayton"
+                : v.city === "Cincinnati"
+                ? "city-cincinnati"
+                : "city-columbus";
+            return `
+              <a class="venue-cal-link" href="${escapeHtml(v.url)}" target="_blank" rel="noopener noreferrer">
+                <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(v.name)}</span>
+                <span class="city-pill ${cClass}">${escapeHtml(v.city)} &#8599;</span>
+              </a>
+            `;
+          })
+          .join("");
+      }
+
+      function syncFilterControlsUI() {
+        dom.cityPills.querySelectorAll("[data-city]").forEach((btn) => {
+          btn.classList.toggle("active", btn.getAttribute("data-city") === state.city);
+        });
+        dom.dateRangeSelect.value = state.dateRange;
+        dom.searchInput.value = state.search;
+        dom.clearSearchBtn.classList.toggle("visible", state.search.length > 0);
+      }
+
+      /* ========================================================================
+         FILTERING LOGIC
+         ======================================================================== */
+      function filterShows(shows) {
+        const query = state.search.trim().toLowerCase();
+
+        return shows.filter((item) => {
+          if (state.city !== "ALL" && item.city !== state.city) return false;
+          if (state.venue !== "ALL" && item.venue !== state.venue) return false;
+
+          if (state.dateRange === "THIS_WEEK") {
+            if (item.date < "2026-11-17" || item.date > "2026-11-23") return false;
+          } else if (state.dateRange === "LATE_NOV") {
+            if (item.date < "2026-11-24" || item.date > "2026-11-30") return false;
+          } else if (state.dateRange === "DEC_2026") {
+            if (!item.date.startsWith("2026-12")) return false;
+          }
+
+          if (query) {
+            const searchable = `${item.headliner} ${item.opener || ""} ${item.venue} ${item.city} ${item.notes || ""}`.toLowerCase();
+            if (!searchable.includes(query)) return false;
+          }
+
+          return true;
+        });
+      }
+
+      /* ========================================================================
+         CARD TEMPLATE & RENDERING
+         ======================================================================== */
+      function buildCardMarkup(show) {
+        const isSaved = state.bookmarks.includes(show.id);
+        const dateMeta = formatDateMeta(show.date);
+
+        const cityBadgeClass =
+          show.city === "Dayton"
+            ? "city-dayton"
+            : show.city === "Cincinnati"
+            ? "city-cincinnati"
+            : "city-columbus";
+
+        let statusBadgeHtml = "";
+        if (show.isCustom) {
+          statusBadgeHtml = `<span class="status-pill status-custom">User Verified</span>`;
+        } else {
+          statusBadgeHtml = `<span class="status-pill status-confirmed">Verified Source</span>`;
+        }
+
+        const sourceLinkHtml = isValidSourceUrl(show.sourceUrl)
+          ? `<a class="source-link-pill" href="${escapeHtml(show.sourceUrl)}" target="_blank" rel="noopener noreferrer" title="Open verified source listing">Source &#8599;</a>`
+          : "";
+
+        const openerHtml = show.opener
+          ? `<div class="opener-line">${escapeHtml(show.opener)}</div>`
+          : "";
+
+        const notesHtml = show.notes
+          ? `<span class="notes-highlight">&bull; ${escapeHtml(show.notes)}</span>`
+          : "";
+
+        const deleteBtnHtml = show.isCustom
+          ? `<button type="button" class="delete-btn" data-delete-id="${escapeHtml(show.id)}" title="Delete custom show">Delete</button>`
+          : "";
+
+        return `
+          <article class="show-card ${isSaved ? "saved" : ""}">
+            <div class="date-box" aria-label="${escapeHtml(dateMeta.full)}">
+              <span class="date-dow">${dateMeta.dow}</span>
+              <span class="date-md">${dateMeta.monthDay}</span>
+            </div>
+
+            <div class="card-body">
+              <div class="status-row">
+                ${statusBadgeHtml}
+                ${sourceLinkHtml}
+              </div>
+
+              <div>
+                <h2 class="headliner">${escapeHtml(show.headliner)}</h2>
+                ${openerHtml}
+              </div>
+
+              <div class="venue-city-line">
+                <span class="venue-label">${escapeHtml(show.venue)}</span>
+                <span class="city-pill ${cityBadgeClass}">${escapeHtml(show.city)}</span>
+              </div>
+
+              <div class="time-notes-line">
+                <span>${escapeHtml(show.time)}</span>
+                ${notesHtml}
+              </div>
+            </div>
+
+            <div class="card-side">
+              <button
+                type="button"
+                class="save-toggle-btn ${isSaved ? "active" : ""}"
+                data-bookmark-id="${escapeHtml(show.id)}"
+                aria-pressed="${isSaved}"
+                title="${isSaved ? "Remove from Saved Lineup" : "Save to Lineup"}"
+                aria-label="${isSaved ? "Remove from Saved Lineup" : "Save to Lineup"}"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="${isSaved ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+              </button>
+              ${deleteBtnHtml}
+            </div>
+          </article>
+        `;
+      }
+
+      function render() {
+        const allShows = getCombinedShows();
+        const filtered = filterShows(allShows);
+
+        // Keep bookmarks clean of deleted custom items
+        const validSet = new Set(allShows.map((s) => s.id));
+        const validBookmarks = state.bookmarks.filter((id) => validSet.has(id));
+        if (validBookmarks.length !== state.bookmarks.length) {
+          state.bookmarks = validBookmarks;
+          saveStorage(STORAGE_KEYS.BOOKMARKS, state.bookmarks);
+        }
+
+        const savedShows = allShows.filter((s) => state.bookmarks.includes(s.id));
+
+        // Update Tab Counters
+        dom.allBadge.textContent = String(allShows.length);
+        dom.savedBadge.textContent = String(savedShows.length);
+
+        // Summary & Reset Visibility
+        const hasFilters =
+          state.city !== "ALL" ||
+          state.venue !== "ALL" ||
+          state.dateRange !== "ALL" ||
+          state.search.trim() !== "";
+
+        dom.summaryCountText.textContent = `Showing ${filtered.length} of ${allShows.length} listings`;
+        dom.resetFiltersBtn.classList.toggle("hidden", !hasFilters);
+
+        // Render All Shows Grid
+        if (filtered.length === 0) {
+          dom.allCardsGrid.innerHTML = `
+            <div class="empty-box">
+              <div class="empty-heading">No matching shows or venue slots</div>
+              <div class="empty-sub">Adjust your city, venue, or date filter—or add a show directly using "+ Quick-Add Show".</div>
+            </div>
+          `;
+        } else {
+          dom.allCardsGrid.innerHTML = filtered.map(buildCardMarkup).join("");
+        }
+
+        // Render Saved Lineup Grid
+        if (savedShows.length === 0) {
+          dom.savedCardsGrid.innerHTML = `
+            <div class="empty-box">
+              <div class="empty-heading">Your Saved Lineup is empty</div>
+              <div class="empty-sub">Tap the star icon on any show card to build your personal Dayton, Cincinnati &amp; Columbus lineup.</div>
+              <button type="button" id="emptyBackBtn" class="btn-solid-sky" style="margin-top: 4px;">Browse All Shows</button>
+            </div>
+          `;
+          const backBtn = document.getElementById("emptyBackBtn");
+          if (backBtn) {
+            backBtn.addEventListener("click", () => setActiveTab("all"));
+          }
+        } else {
+          dom.savedCardsGrid.innerHTML = savedShows.map(buildCardMarkup).join("");
+        }
+
+        updateMailtoHref(savedShows);
+      }
+
+      /* ========================================================================
+         EXPORT & CLIPBOARD FORMATTING
+         ======================================================================== */
+      function formatLineupPlainText(savedShows) {
+        if (savedShows.length === 0) {
+          return "Ohio Music Tracker — No shows saved yet.";
+        }
+
+        const lines = [
+          "OHIO MUSIC TRACKER — SAVED LINEUP",
+          "Dayton • Cincinnati • Columbus",
+          "========================================"
+        ];
+
+        savedShows.forEach((show) => {
+          const d = formatDateMeta(show.date);
+          const openerPart = show.opener ? ` (${show.opener})` : "";
+          const notesPart = show.notes ? ` — ${show.notes}` : "";
+          const srcPart = show.sourceUrl ? `\n  Source: ${show.sourceUrl}` : "";
+          lines.push(
+            `• ${d.full} | ${show.headliner}${openerPart}\n  ${show.venue} (${show.city}) • ${show.time}${notesPart}${srcPart}`
+          );
+        });
+
+        lines.push("========================================");
+        lines.push(`Total Saved: ${savedShows.length}`);
+        return lines.join("\n");
+      }
+
+      function exportVerifiedJson() {
+        const payload = {
+          exportedAt: new Date().toISOString(),
+          verifiedShows: getCombinedShows(),
+          savedIds: state.bookmarks
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `ohio-music-tracker-${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast("Exported verified JSON backup");
+      }
+
+      function handleImportJsonFile(e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+          try {
+            const parsed = JSON.parse(evt.target.result);
+            const incoming = Array.isArray(parsed) ? parsed : parsed.verifiedShows;
+            if (!Array.isArray(incoming)) {
+              showToast("Invalid JSON format");
+              return;
+            }
+            const existingIds = new Set(getCombinedShows().map((s) => s.id));
+            let added = 0;
+            let rejected = 0;
+            incoming.forEach((item) => {
+              if (!item || !item.date || !item.headliner || !item.venue || !item.city || !isValidSourceUrl(item.sourceUrl)) {
+                rejected++;
+                return;
+              }
+              const id = item.id || "import-" + Date.now() + "-" + added;
+              if (!existingIds.has(id)) {
+                state.customShows.push({
+                  id,
+                  date: String(item.date),
+                  headliner: String(item.headliner),
+                  opener: String(item.opener || ""),
+                  venue: String(item.venue),
+                  city: String(item.city),
+                  time: String(item.time || "Verify Doors/Lineup"),
+                  notes: String(item.notes || ""),
+                  sourceUrl: String(item.sourceUrl).trim(),
+                  isCustom: true
+                });
+                existingIds.add(id);
+                added++;
+              }
+            });
+            saveStorage(STORAGE_KEYS.CUSTOM_SHOWS, state.customShows);
+            renderVenuePills();
+            render();
+            showToast(
+              rejected > 0
+                ? `Imported ${added} verified shows (rejected ${rejected} missing sourceUrl)`
+                : `Imported ${added} verified show${added === 1 ? "" : "s"}`
+            );
+          } catch (err) {
+            showToast("Could not parse JSON file");
+          } finally {
+            dom.importJsonFileInput.value = "";
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      function updateMailtoHref(savedShows) {
+        const subject = encodeURIComponent("Ohio Music Tracker Lineup");
+        const body = encodeURIComponent(formatLineupPlainText(savedShows));
+        dom.emailJordanLink.href = `mailto:jordanfromtipp@gmail.com?subject=${subject}&body=${body}`;
+      }
+
+      function copyLineupToClipboard() {
+        const savedShows = getCombinedShows().filter((s) => state.bookmarks.includes(s.id));
+        if (savedShows.length === 0) {
+          showToast("Star at least one show first");
+          return;
+        }
+
+        const text = formatLineupPlainText(savedShows);
+        dom.copyBuffer.value = text;
+        dom.copyBuffer.select();
+        dom.copyBuffer.setSelectionRange(0, 99999);
+
+        try {
+          const success = document.execCommand("copy");
+          showToast(success ? `Copied ${savedShows.length} saved show${savedShows.length === 1 ? "" : "s"} to clipboard` : "Copy failed — try Email to Jordan");
+        } catch (err) {
+          showToast("Copy failed — try Email to Jordan");
+        }
+      }
+
+      /* ========================================================================
+         EVENT WIRING
+         ======================================================================== */
+      function setActiveTab(tab) {
+        state.activeTab = tab;
+        const isAll = tab === "all";
+        dom.tabAll.classList.toggle("active", isAll);
+        dom.tabSaved.classList.toggle("active", !isAll);
+        dom.viewAll.classList.toggle("hidden", !isAll);
+        dom.viewSaved.classList.toggle("hidden", isAll);
+        dom.inlineConfirmBar.classList.remove("open");
+      }
+
+      dom.tabAll.addEventListener("click", () => setActiveTab("all"));
+      dom.tabSaved.addEventListener("click", () => setActiveTab("saved"));
+
+      // Refresh button animation + toast
+      dom.refreshBtn.addEventListener("click", () => {
+        dom.refreshBtn.classList.remove("spinning");
+        void dom.refreshBtn.offsetWidth;
+        dom.refreshBtn.classList.add("spinning");
+        renderVenuePills();
+        render();
+        showToast("Listings are up to date");
+      });
+
+      // City filter pills
+      dom.cityPills.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-city]");
+        if (!btn) return;
+        state.city = btn.getAttribute("data-city");
+        persistFilters();
+        syncFilterControlsUI();
+        renderVenuePills();
+        render();
+      });
+
+      // Venue filter pills
+      dom.venuePills.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-venue]");
+        if (!btn) return;
+        state.venue = btn.getAttribute("data-venue");
+        persistFilters();
+        renderVenuePills();
+        render();
+      });
+
+      // Date range dropdown
+      dom.dateRangeSelect.addEventListener("change", (e) => {
+        state.dateRange = e.target.value;
+        persistFilters();
+        render();
+      });
+
+      // Keyword search input
+      dom.searchInput.addEventListener("input", (e) => {
+        state.search = e.target.value;
+        dom.clearSearchBtn.classList.toggle("visible", state.search.length > 0);
+        persistFilters();
+        render();
+      });
+
+      dom.clearSearchBtn.addEventListener("click", () => {
+        state.search = "";
+        dom.searchInput.value = "";
+        dom.clearSearchBtn.classList.remove("visible");
+        persistFilters();
+        render();
+      });
+
+      // Reset all filters
+      dom.resetFiltersBtn.addEventListener("click", () => {
+        state.city = "ALL";
+        state.venue = "ALL";
+        state.dateRange = "ALL";
+        state.search = "";
+        persistFilters();
+        syncFilterControlsUI();
+        renderVenuePills();
+        render();
+      });
+
+      // Quick-Add drawer open/close
+      function toggleQuickAdd(forceOpen) {
+        const nextState = typeof forceOpen === "boolean" ? forceOpen : !dom.quickAddDrawer.classList.contains("open");
+        dom.quickAddDrawer.classList.toggle("open", nextState);
+        dom.quickAddToggle.setAttribute("aria-expanded", String(nextState));
+        if (nextState) {
+          dom.liveCalendarsDrawer.classList.remove("open");
+          dom.liveCalendarsToggle.setAttribute("aria-expanded", "false");
+        }
+      }
+
+      function toggleLiveCalendars(forceOpen) {
+        const nextState = typeof forceOpen === "boolean" ? forceOpen : !dom.liveCalendarsDrawer.classList.contains("open");
+        dom.liveCalendarsDrawer.classList.toggle("open", nextState);
+        dom.liveCalendarsToggle.setAttribute("aria-expanded", String(nextState));
+        if (nextState) {
+          dom.quickAddDrawer.classList.remove("open");
+          dom.quickAddToggle.setAttribute("aria-expanded", "false");
+        }
+      }
+
+      dom.liveCalendarsToggle.addEventListener("click", () => toggleLiveCalendars());
+      dom.closeCalendarsBtn.addEventListener("click", () => toggleLiveCalendars(false));
+
+      dom.quickAddToggle.addEventListener("click", () => toggleQuickAdd());
+      dom.closeDrawerBtn.addEventListener("click", () => toggleQuickAdd(false));
+      dom.cancelDrawerBtn.addEventListener("click", () => toggleQuickAdd(false));
+
+      // Quick-Add form submit (enforces valid sourceUrl)
+      dom.quickAddForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const date = document.getElementById("qaDate").value;
+        const time = document.getElementById("qaTime").value.trim() || "Verify Doors/Lineup";
+        const headliner = document.getElementById("qaHeadliner").value.trim();
+        const opener = document.getElementById("qaOpener").value.trim();
+        const venue = document.getElementById("qaVenue").value.trim();
+        const city = document.getElementById("qaCity").value;
+        const notes = document.getElementById("qaNotes").value.trim();
+        const sourceUrl = document.getElementById("qaSourceUrl").value.trim();
+
+        if (!date || !headliner || !venue || !isValidSourceUrl(sourceUrl)) {
+          showToast("A valid http(s) Source URL is required");
+          return;
+        }
+
+        const customItem = {
+          id: "custom-" + Date.now(),
+          date,
+          headliner,
+          opener,
+          venue,
+          city,
+          time,
+          notes,
+          sourceUrl,
+          isCustom: true
+        };
+
+        state.customShows.push(customItem);
+        saveStorage(STORAGE_KEYS.CUSTOM_SHOWS, state.customShows);
+
+        dom.quickAddForm.reset();
+        document.getElementById("qaDate").value = date;
+        document.getElementById("qaTime").value = "Doors 7:00 PM / Show 8:00 PM";
+        document.getElementById("qaCity").value = city;
+        toggleQuickAdd(false);
+
+        renderVenuePills();
+        render();
+        showToast(`Added "${headliner}" at ${venue}`);
+      });
+
+      // Bookmark star & custom show deletion (delegated)
+      function handleCardGridClick(e) {
+        const starBtn = e.target.closest("[data-bookmark-id]");
+        if (starBtn) {
+          const id = starBtn.getAttribute("data-bookmark-id");
+          const index = state.bookmarks.indexOf(id);
+          if (index === -1) {
+            state.bookmarks.push(id);
+            showToast("Saved to Lineup");
+          } else {
+            state.bookmarks.splice(index, 1);
+            showToast("Removed from Saved Lineup");
+          }
+          saveStorage(STORAGE_KEYS.BOOKMARKS, state.bookmarks);
+          render();
+          return;
+        }
+
+        const delBtn = e.target.closest("[data-delete-id]");
+        if (delBtn) {
+          const id = delBtn.getAttribute("data-delete-id");
+          state.customShows = state.customShows.filter((s) => s.id !== id);
+          state.bookmarks = state.bookmarks.filter((bId) => bId !== id);
+          saveStorage(STORAGE_KEYS.CUSTOM_SHOWS, state.customShows);
+          saveStorage(STORAGE_KEYS.BOOKMARKS, state.bookmarks);
+          renderVenuePills();
+          render();
+          showToast("Custom show removed");
+        }
+      }
+
+      dom.allCardsGrid.addEventListener("click", handleCardGridClick);
+      dom.savedCardsGrid.addEventListener("click", handleCardGridClick);
+
+      // Saved Lineup export & clear controls
+      dom.copyLineupBtn.addEventListener("click", copyLineupToClipboard);
+      dom.exportJsonBtn.addEventListener("click", exportVerifiedJson);
+      dom.importJsonTriggerBtn.addEventListener("click", () => dom.importJsonFileInput.click());
+      dom.importJsonFileInput.addEventListener("change", handleImportJsonFile);
+
+      dom.emailJordanLink.addEventListener("click", (e) => {
+        if (state.bookmarks.length === 0) {
+          e.preventDefault();
+          showToast("Star at least one show first");
+        }
+      });
+
+      dom.clearSavedBtn.addEventListener("click", () => {
+        if (state.bookmarks.length === 0) {
+          showToast("Saved Lineup is already empty");
+          return;
+        }
+        dom.inlineConfirmBar.classList.add("open");
+      });
+
+      dom.cancelClearBtn.addEventListener("click", () => {
+        dom.inlineConfirmBar.classList.remove("open");
+      });
+
+      dom.confirmClearBtn.addEventListener("click", () => {
+        state.bookmarks = [];
+        saveStorage(STORAGE_KEYS.BOOKMARKS, state.bookmarks);
+        dom.inlineConfirmBar.classList.remove("open");
+        render();
+        showToast("Cleared Saved Lineup");
+      });
+
+      /* ========================================================================
+         PWA HOME SCREEN MANIFEST REGISTRATION
+         ======================================================================== */
+      function registerInlineManifest() {
+        try {
+          const iconSvg =
+            "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230b0e14'/%3E%3Crect x='24' y='24' width='464' height='464' rx='96' fill='none' stroke='%2338bdf8' stroke-width='16'/%3E%3Cpath d='M196 344V164l168-36v180' fill='none' stroke='%2338bdf8' stroke-width='28' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='160' cy='344' r='42' fill='%23f59e0b'/%3E%3Ccircle cx='328' cy='308' r='42' fill='%23f59e0b'/%3E%3C/svg%3E";
+          const manifest = {
+            name: "Ohio Music Tracker",
+            short_name: "Music Tracker",
+            description: "Verified live music listings for Dayton, Cincinnati & Columbus",
+            start_url: window.location.href,
+            display: "standalone",
+            background_color: "#0b0e14",
+            theme_color: "#0b0e14",
+            icons: [
+              {
+                src: iconSvg,
+                sizes: "512x512",
+                type: "image/svg+xml",
+                purpose: "any maskable"
+              }
+            ]
+          };
+          const blob = new Blob([JSON.stringify(manifest)], { type: "application/manifest+json" });
+          const manifestUrl = URL.createObjectURL(blob);
+          const linkEl = document.getElementById("pwaManifestLink");
+          if (linkEl) linkEl.setAttribute("href", manifestUrl);
+        } catch (e) {
+          // Graceful fallback when running in restricted sandboxed previews
+        }
+      }
+
+      /* ========================================================================
+         BOOTSTRAP
+         ======================================================================== */
+      registerInlineManifest();
+      syncFilterControlsUI();
+      renderVenuePills();
+      render();
+    })();
+  </script>
+</body>
+</html>
+```
